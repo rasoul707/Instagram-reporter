@@ -1,0 +1,25 @@
+{
+  "dependencies": {
+    "puppeteer": "^17.1.1",
+    "puppeteer-extra": "^3.3.4",
+    "user-agents": "^1.0.1124"
+  },
+  "name": "instagram-reporter",
+  "description": "This bot helps users to mass report accounts with clickbaits or objectionable material",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Khanejo/Instagram-reporter.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Khanejo/Instagram-reporter/issues"
+  },
+  "homepage": "https://github.com/Khanejo/Instagram-reporter#readme"
+}
