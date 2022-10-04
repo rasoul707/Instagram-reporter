@@ -9,6 +9,7 @@ const { exit } = require('process');
 const puppeteer = require('puppeteer-extra');
 const UserAgent = require('user-agents');
 const fs = require("fs")
+const path = require('path');
 
 // ###########################################################
 // ###########################################################
@@ -16,20 +17,20 @@ const fs = require("fs")
 
 const chromeOptions = {
     executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
-    headless: false,
+    headless: true,
     defaultViewport: null,
-    // args: [
-    //     "--incognito",
-    //     "--no-sandbox",
-    //     "--single-process",
-    //     "--no-zygote",
-    //     "--disable-setuid-sandbox",
-    //     "--disable-dev-shm-usage",
-    //     "--disable-accelerated-2d-canvas",
-    //     "--disable-gpu",
-    //     "--window-size=1920x1080",
-    // ],
-    // userDataDir: "./browser/myPanelData"
+    args: [
+        // "--incognito",
+        "--no-sandbox",
+        // "--single-process",
+        // "--no-zygote",
+        // "--disable-setuid-sandbox",
+        // "--disable-dev-shm-usage",
+        // "--disable-accelerated-2d-canvas",
+        // "--disable-gpu",
+        "--window-size=1920x1080",
+    ],
+    userDataDir: "./browser"
 };
 
 const blockedResourceTypes = [
@@ -173,7 +174,7 @@ const doReport = async (page, account) => {
 
 
 const doLogin = async (page, username, password) => {
-    const url = `https://www.instagram.com/accounts/login/`
+    const url = `https://www.tradingview.com/chart/MQmuYSvZ/?symbol=BINANCE%3AETHUSDT`
     await page.goto(url, { waitUntil: 'networkidle2', }).catch(e => { throw "NavigateFailed" })
     if (await page.url() === url) {
         await page.type('input[name="username"]', username).catch(e => { throw "UsernameTypeFailed" })
@@ -183,43 +184,57 @@ const doLogin = async (page, username, password) => {
     } else {
         throw "OthersProblem"
     }
-    await page.waitForTimeout(5000)
+    await page.waitForTimeout(500000)
 }
 
 
 
 (async () => {
     // get account list for report
-    const accountsForReport = await getAccountsForReport()
+    // const accountsForReport = await getAccountsForReport()
     // get list of user pass
-    const users = await getUsers()
+    // const users = await getUsers()
 
 
     // browser
     const browser = await openBrowser()
     const page = await newPage(browser)
 
+    const url = `https://www.tradingview.com/chart/MQmuYSvZ/?symbol=BINANCE%3AETHUSDT`
+    await page.goto(url, { waitUntil: 'networkidle2', }).catch(e => { throw "NavigateFailed" })
+
+    console.log("GGGG")
+
+    const downloadPath = path.resolve('./snapshots');
+    await page._client().send('Page.setDownloadBehavior', { behavior: 'allow', downloadPath: downloadPath });
+
+
+    page.keyboard.press('ControlLeft')
+    page.keyboard.press('AltLeft')
+    await page.keyboard.press('KeyS')
+
 
     // login
-    for (let x = 0; x < users.length; x++) {
-        try {
-            await doLogin(page, users[x][0], users[x][1])
-            console.log("LOGIN:", users[x][0], "> Success")
-            //  reporting
-            for (let i = 0; i < accountsForReport.length; i++) {
-                try {
-                    await doReport(page, accountsForReport[i])
-                    console.log("REPORT:", accountsForReport[i], "> Success")
-                }
-                catch (err) {
-                    console.log("REPORT:", accountsForReport[i], "> Error:", err)
-                }
-            }
-        }
-        catch (err) {
-            console.log("LOGIN:", users[x][0], "> Error:", err)
-        }
-    }
+    // for (let x = 0; x < users.length; x++) {
+    //     try {
+    //         await doLogin(page, users[x][0], users[x][1])
+    //         console.log("LOGIN:", users[x][0], "> Success")
+    //         //  reporting
+    //         for (let i = 0; i < accountsForReport.length; i++) {
+    //             try {
+    //                 await doReport(page, accountsForReport[i])
+    //                 console.log("REPORT:", accountsForReport[i], "> Success")
+    //             }
+    //             catch (err) {
+    //                 console.log("REPORT:", accountsForReport[i], "> Error:", err)
+    //             }
+    //         }
+    //     }
+    //     catch (err) {
+    //         console.log("LOGIN:", users[x][0], "> Error:", err)
+    //     }
+    // }
+    await page.waitForTimeout(500000)
 
     await browser.close()
 })()
